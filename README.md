@@ -40,3 +40,79 @@ dokcer node ls
 
 ## Drain manager node on the swarm
 
+The swarm manager can assign tasks to any ACTIVE node, so up to now, all nodes have been available to receive tasks. When we create a service in master, the master itself acts as a worker, therefore to avoid it we run drain master server. So to drain the master server, we need to change the availability state to drain:
+```bash
+docker node update --availability drain {master-server-hostname}
+docker node ls
+ ```
+
+
+## Label the worker instances
+
+We use Labels to add extra metadata to your docker images, service, networks, swarm nodes etc. Once added these label(s) allows you to filter your docker resources.
+~~~bash
+docker node update --label-add resource=cache {worker-server-hostname}
+docker node update --label-add resource=disk {worker-server-hostname}
+~~~
+> Here I use 2 worker instnaces so am adding lables for those two. You can use 3 worker instances, like 1 for redis image, 1 for api-service image, and 1 for frontend image.
+
+## Create an overlay network
+
+Overlay networks connect multiple Docker daemons together and enable swarm services to communicate with each other.
+```bash
+docker network create --driver overlay <network name>
+```
+> An overlay network called ingress, which handles the control and data traffic related to swarm services. When you create a swarm service and do not connect it to a user-defined overlay network, it connects to the ingress network by default.
+
+## Create services
+
+**Redis cache**
+
+It's for caching and here I'm usin the redis latest version image.
+
+```bash
+docker service create \
+--name iplocation-cache-service \
+--replicas 1 \
+--network iplocation-net \
+--constraint 'node.labels.resource == cache' \
+redis:latest
+```
+The --replicas flag specifies the desired state of 1 running instance.
+Here my network name is iplocation-net,please replace it with your network name.
+
+**API Layer**
+
+```bash
+docker service create \
+--name iplocation-api-service \
+--network iplocation-net \
+--replicas 4 \
+--constraint 'node.labels.resource == disk' \
+-e REDIS_PORT="6379" \
+-e REDIS_HOST="iplocation-cache-service" \
+-e APP_PORT="8080" \
+-e API_KEY=<"your-API-KEY"> \
+radinlawrence/ipgeolocation-api:v1
+```
+> Remember to replace " your-api-key " with your own key. Here I'm using the free plan of ipgeolocation.io to generate api_key: https://app.ipgeolocation.io/
+
+
+**Front-end**
+
+```bash
+docker service create \
+--name iplocation-frontend-service \
+--network iplocation-net \
+--replicas 4 \
+--constraint 'node.labels.resource == disk' \
+-e API_SERVER="iplocation-api-service" \
+-e API_SERVER_PORT="8080" \
+-e API_PATH="/api/v1/" \
+-e APP_PORT="8080" \
+-p 80:8080 \
+radinlawrence/ipgeolocation-frontend:v1
+```
+
+Now our setup is complete and you can point the frontend server public IP  or  can point the resource disk  labeled public IP server to a domain name.
+eg: http://example.com/ip/8.8.8.8
