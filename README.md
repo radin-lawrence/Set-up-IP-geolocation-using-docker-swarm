@@ -20,6 +20,7 @@ Open a terminal and ssh into the machine where you want to run your manager node
  docker swarm init
 ```
 
+![image](https://user-images.githubusercontent.com/100775027/166470140-7d0ee8cf-e5aa-4e72-9e43-656ee9f97f90.png)
 
 
 If you don’t have the command available, you can run the following command on a manager node to retrieve the join command for a worker:
@@ -30,13 +31,16 @@ docker swarm join-token worker
 
 Run this generated join token in both of your worker instnaces:
 
-
+```bash
+docker swar join --token  <YOURS TOKEN>
+```
 
 To view information about nodes and verify the workers has been added to master:
 
 ```bash
 dokcer node ls
 ```
+![image](https://user-images.githubusercontent.com/100775027/166471465-fbb8064e-9628-4cb3-bf6e-82e9cb7ffeab.png)
 
 ## Drain manager node on the swarm
 
@@ -45,6 +49,7 @@ The swarm manager can assign tasks to any ACTIVE node, so up to now, all nodes h
 docker node update --availability drain {master-server-hostname}
 docker node ls
  ```
+![image](https://user-images.githubusercontent.com/100775027/166471158-3a13a7e0-8641-48ff-8934-047edb380d13.png)
 
 
 ## Label the worker instances
@@ -54,6 +59,8 @@ We use Labels to add extra metadata to your docker images, service, networks, sw
 docker node update --label-add resource=cache {worker-server-hostname}
 docker node update --label-add resource=disk {worker-server-hostname}
 ~~~
+![image](https://user-images.githubusercontent.com/100775027/166471032-40875a8f-3b6c-45a4-9029-1244f04f3fba.png)
+
 > Here I use 2 worker instnaces so am adding lables for those two. You can use 3 worker instances, like 1 for redis image, 1 for api-service image, and 1 for frontend image.
 
 ## Create an overlay network
@@ -78,6 +85,8 @@ docker service create \
 --constraint 'node.labels.resource == cache' \
 redis:latest
 ```
+![image](https://user-images.githubusercontent.com/100775027/166470934-45c0b730-cd99-488a-842a-f82636cce16b.png)
+
 The --replicas flag specifies the desired state of 1 running instance.
 Here my network name is iplocation-net,please replace it with your network name.
 
@@ -113,6 +122,17 @@ docker service create \
 -p 80:8080 \
 radinlawrence/ipgeolocation-frontend:v1
 ```
+![image](https://user-images.githubusercontent.com/100775027/166469990-7f8fd3ee-4ca6-4117-8df3-3c73e8ea91cd.png)
+
+```bash
+docekr service ls
+```
+![image](https://user-images.githubusercontent.com/100775027/166470803-b64ee551-fc2b-4f96-87ab-ac527b955c1d.png)
+
+
 
 Now our setup is complete and you can point the frontend server public IP  or  can point the resource disk  labeled public IP server to a domain name.
 eg: http://example.com/ip/8.8.8.8
+
+![image](https://user-images.githubusercontent.com/100775027/166469649-2bb5a2f2-938c-4fbe-b619-2b26ee1f9516.png)
+
