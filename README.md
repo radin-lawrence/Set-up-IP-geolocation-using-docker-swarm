@@ -32,7 +32,7 @@ docker swarm join-token worker
 Run this generated join token in both of your worker instnaces:
 
 ```bash
-docker swar join --token  <YOURS TOKEN>
+docker swarm join --token  <YOURS TOKEN>
 ```
 
 To view information about nodes and verify the workers has been added to master:
