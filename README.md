@@ -136,3 +136,12 @@ eg: http://example.com/ip/8.8.8.8
 
 ![image](https://user-images.githubusercontent.com/100775027/166469649-2bb5a2f2-938c-4fbe-b619-2b26ee1f9516.png)
 
+## Conclusion
+This is how Set up IP geolocation using docker-swarm. Please contact me when you encounter any difficulty error while using this terrform code. Thank you and have a great day!
+
+
+ ### ⚙️ Connect with Me
+<p align="center">
+<a href="https://www.linkedin.com/in/radin-lawrence-8b3270102/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"/></a>
+<a href="mailto:radin.lawrence@gmail.com"><img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white"/></a>
+
